@@ -12,47 +12,27 @@ st.markdown("""
 
     * { font-family: 'DM Sans', sans-serif; }
     .stApp { background-color: #F7F6F2; }
-
     #MainMenu, footer, header { visibility: hidden; }
 
     .main-title {
-        font-size: 2rem;
-        font-weight: 500;
-        color: #1a1a1a;
-        text-align: center;
-        letter-spacing: -0.5px;
-        margin-bottom: 0.2rem;
+        font-size: 2rem; font-weight: 500; color: #1a1a1a;
+        text-align: center; letter-spacing: -0.5px; margin-bottom: 0.2rem;
     }
     .sub-title {
-        font-size: 0.9rem;
-        color: #999;
-        text-align: center;
-        font-weight: 300;
-        margin-bottom: 2rem;
+        font-size: 0.9rem; color: #999; text-align: center;
+        font-weight: 300; margin-bottom: 2rem;
     }
     .result-box {
-        background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        text-align: center;
-        margin-top: 1.5rem;
+        background: white; border-radius: 16px; padding: 2rem;
+        text-align: center; margin-top: 1.5rem;
         box-shadow: 0 2px 20px rgba(0,0,0,0.06);
     }
-    .result-label {
-        font-size: 2.4rem;
-        font-weight: 500;
-        color: #1a1a1a;
-        letter-spacing: -1px;
-    }
-    .result-conf {
-        font-size: 0.88rem;
-        color: #bbb;
-        margin-top: 0.3rem;
-    }
-    .filename-row {
-        font-size: 0.85rem;
-        color: #555;
-        padding: 0.5rem 0 0.5rem 0;
+    .result-label { font-size: 2.4rem; font-weight: 500; color: #1a1a1a; letter-spacing: -1px; }
+    .result-conf { font-size: 0.88rem; color: #bbb; margin-top: 0.3rem; }
+
+    /* File name row hide karo - Streamlit ka default */
+    [data-testid="stFileUploader"] > section > div > div:last-child {
+        display: none !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -64,11 +44,9 @@ def load_cat_dog_model():
 
 model = load_cat_dog_model()
 
-# Header
 st.markdown('<p class="main-title">🐾 Cat vs Dog</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Upload an image to identify</p>', unsafe_allow_html=True)
 
-# Upload - plain, no CSS tricks
 uploaded_file = st.file_uploader(
     "Upload Image",
     type=["jpg", "jpeg", "png", "jfif", "webp"],
@@ -76,16 +54,10 @@ uploaded_file = st.file_uploader(
 )
 
 if uploaded_file is not None:
-
-    # Show uploaded file name cleanly
-    st.markdown(f'<p class="filename-row">📄 {uploaded_file.name}</p>', unsafe_allow_html=True)
-
-    # Show image centered
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.image(uploaded_file, width=380)
 
-    # Prepare and predict
     img = Image.open(uploaded_file).convert('RGB')
     img = img.resize((64, 64))
     img_array = image.img_to_array(img) / 255.0
@@ -95,10 +67,10 @@ if uploaded_file is not None:
     score = result[0][0]
 
     if score >= 0.5:
-        label    = "Dog 🐶"
+        label      = "Dog 🐶"
         confidence = score
     else:
-        label    = "Cat 🐱"
+        label      = "Cat 🐱"
         confidence = 1 - score
 
     st.markdown(f"""
