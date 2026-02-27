@@ -29,40 +29,20 @@ st.markdown("""
     .result-label { font-size: 2.4rem; font-weight: 500; color: #1a1a1a; letter-spacing: -1px; }
     .result-conf { font-size: 0.88rem; color: #bbb; margin-top: 0.3rem; }
 
-    /* Pura file uploader widget hide karo */
-    [data-testid="stFileUploader"] { display: none !important; }
-
-    /* Custom upload button */
-    .upload-btn {
-        display: block;
-        width: 100%;
-        background: #1a1a1a;
-        color: white !important;
-        text-align: center;
-        padding: 1.2rem;
-        border-radius: 14px;
-        font-size: 1rem;
-        font-weight: 400;
-        letter-spacing: 0.2px;
-        cursor: pointer;
-        margin-bottom: 1.5rem;
-    }
-
-    /* Streamlit button style override */
-    [data-testid="stFileUploader"] { display: none !important; }
-
-    div[data-testid="stButton"] button {
-        background-color: #1a1a1a !important;
-        color: white !important;
+    /* White file row - background ko F7F6F2 karo taaki dikh na */
+    [data-testid="stFileUploader"] > section > div > div:nth-child(2) {
+        background-color: #F7F6F2 !important;
         border: none !important;
-        border-radius: 14px !important;
-        padding: 0.8rem 2rem !important;
-        font-size: 1rem !important;
-        width: 100% !important;
-        font-family: 'DM Sans', sans-serif !important;
+        box-shadow: none !important;
     }
-    div[data-testid="stButton"] button:hover {
-        background-color: #333 !important;
+
+    /* Us row ke andar sab kuch hide */
+    [data-testid="stFileUploader"] > section > div > div:nth-child(2) > div {
+        visibility: hidden !important;
+        height: 0px !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -77,39 +57,11 @@ model = load_cat_dog_model()
 st.markdown('<p class="main-title">🐾 Cat vs Dog</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Upload an image to identify</p>', unsafe_allow_html=True)
 
-# Hidden uploader
 uploaded_file = st.file_uploader(
-    "x",
+    "Upload Image",
     type=["jpg", "jpeg", "png", "jfif", "webp"],
-    label_visibility="collapsed",
-    key="uploader"
+    label_visibility="collapsed"
 )
-
-# Custom visible button — triggers the hidden uploader via JS
-st.markdown("""
-<label for="uploader" style="
-    display: block;
-    background: #1a1a1a;
-    color: white;
-    text-align: center;
-    padding: 1.1rem;
-    border-radius: 14px;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-bottom: 1rem;
-">
-    ☁️ &nbsp; Choose Image
-</label>
-<script>
-    const label = document.querySelector('label[for="uploader"]');
-    if (label) {
-        label.addEventListener('click', () => {
-            const input = document.querySelector('input[type="file"]');
-            if (input) input.click();
-        });
-    }
-</script>
-""", unsafe_allow_html=True)
 
 if uploaded_file is not None:
     col1, col2, col3 = st.columns([1, 2, 1])
