@@ -4,88 +4,129 @@ from tensorflow.keras.preprocessing import image
 import numpy as np
 from PIL import Image
 
+# ---------------- Page Config ----------------
 st.set_page_config(page_title="Cat vs Dog", page_icon="🐾", layout="centered")
 
+# ---------------- Custom CSS ----------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');
-    * { font-family: 'DM Sans', sans-serif; }
-    .stApp { background-color: #F7F6F2; }
-    #MainMenu, footer, header { visibility: hidden; }
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');
 
-    .main-title {
-        font-size: 2rem; font-weight: 500; color: #1a1a1a;
-        text-align: center; letter-spacing: -0.5px; margin-bottom: 0.2rem;
-    }
-    .sub-title {
-        font-size: 0.9rem; color: #999; text-align: center;
-        font-weight: 300; margin-bottom: 2rem;
-    }
-    .result-box {
-        background: white; border-radius: 16px; padding: 2rem;
-        text-align: center; margin-top: 1.5rem;
-        box-shadow: 0 2px 20px rgba(0,0,0,0.06);
-    }
-    .result-label { font-size: 2.4rem; font-weight: 500; color: #1a1a1a; letter-spacing: -1px; }
-    .result-conf { font-size: 0.88rem; color: #bbb; margin-top: 0.3rem; }
+html, body, [class*="css"] {
+    font-family: 'DM Sans', sans-serif;
+}
 
-    /* White file row - background ko F7F6F2 karo taaki dikh na */
-    [data-testid="stFileUploader"] > section > div > div:nth-child(2) {
-        background-color: #F7F6F2 !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
+.stApp {
+    background-color: #F7F6F2;
+}
 
-    /* Us row ke andar sab kuch hide */
-    [data-testid="stFileUploader"] > section > div > div:nth-child(2) > div {
-        visibility: hidden !important;
-        height: 0px !important;
-        overflow: hidden !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
+/* Hide default menu */
+#MainMenu, footer, header {visibility: hidden;}
+
+/* Titles */
+.main-title {
+    font-size: 2.1rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    text-align: center;
+    margin-bottom: 0.2rem;
+}
+
+.sub-title {
+    font-size: 0.9rem;
+    color: #888;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* File uploader box */
+[data-testid="stFileUploader"] {
+    background: white;
+    border-radius: 16px;
+    padding: 1rem;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+}
+
+/* Make file name visible (black) */
+[data-testid="stFileUploader"] span,
+[data-testid="stFileUploader"] small,
+[data-testid="stFileUploader"] div,
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] p {
+    color: #000000 !important;
+}
+
+/* Result box */
+.result-box {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    margin-top: 1.5rem;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+}
+
+.result-label {
+    font-size: 2.4rem;
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.result-conf {
+    font-size: 0.9rem;
+    color: #999;
+    margin-top: 0.3rem;
+}
 </style>
 """, unsafe_allow_html=True)
 
-
+# ---------------- Load Model ----------------
 @st.cache_resource
 def load_cat_dog_model():
-    return load_model('cat_dog_model.keras')
+    return load_model("cat_dog_model.keras")
 
 model = load_cat_dog_model()
 
-st.markdown('<p class="main-title">🐾 Cat vs Dog</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">Upload an image to identify</p>', unsafe_allow_html=True)
+# ---------------- Header ----------------
+st.markdown('<div class="main-title">🐾 Cat vs Dog Classifier</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Upload an image to identify</div>', unsafe_allow_html=True)
 
+# ---------------- Upload ----------------
 uploaded_file = st.file_uploader(
     "Upload Image",
     type=["jpg", "jpeg", "png", "jfif", "webp"],
     label_visibility="collapsed"
 )
 
+# ---------------- Prediction ----------------
 if uploaded_file is not None:
-    col1, col2, col3 = st.columns([1, 2, 1])
+
+    # Show image center
+    col1, col2, col3 = st.columns([1,2,1])
     with col2:
         st.image(uploaded_file, width=380)
 
-    img = Image.open(uploaded_file).convert('RGB')
+    # Preprocess
+    img = Image.open(uploaded_file).convert("RGB")
     img = img.resize((64, 64))
     img_array = image.img_to_array(img) / 255.0
-    img_array = img_array.reshape(1, 64, 64, 3)
+    img_array = np.reshape(img_array, (1, 64, 64, 3))
 
+    # Predict
     result = model.predict(img_array, verbose=0)
     score = result[0][0]
 
     if score >= 0.5:
-        label      = "Dog 🐶"
+        label = "Dog 🐶"
         confidence = score
     else:
-        label      = "Cat 🐱"
+        label = "Cat 🐱"
         confidence = 1 - score
 
+    # Result display
     st.markdown(f"""
     <div class="result-box">
         <div class="result-label">{label}</div>
-        <div class="result-conf">{confidence*100:.1f}% confidence</div>
+        <div class="result-conf">{confidence*100:.2f}% confidence</div>
     </div>
     """, unsafe_allow_html=True)
