@@ -11,6 +11,7 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');
     html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
     .stApp { background-color: #F7F6F2; }
+
     .main-title {
         font-size: 2.2rem; font-weight: 500; color: #1a1a1a;
         text-align: center; letter-spacing: -0.5px; margin-bottom: 0.2rem;
@@ -26,26 +27,35 @@ st.markdown("""
     }
     .result-label { font-size: 2.5rem; font-weight: 500; color: #1a1a1a; letter-spacing: -1px; }
     .result-conf { font-size: 0.9rem; color: #aaa; margin-top: 0.3rem; font-weight: 300; }
-    #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
 
-    /* Upload box outer white card */
+    .file-name-box {
+        background: white;
+        border-radius: 0 0 12px 12px;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+        color: #1a1a1a !important;
+        margin-top: -1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+
+    /* Upload outer card */
     [data-testid="stFileUploader"] {
-        background: white; border-radius: 16px;
-        padding: 1rem; box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+        background: white;
+        border-radius: 16px;
+        padding: 0;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+        overflow: hidden;
     }
     [data-testid="stFileUploader"] label { display: none; }
 
-    /* Dark drag-drop zone - text WHITE */
-    [data-testid="stFileUploaderDropzone"] { color: white !important; }
-    [data-testid="stFileUploaderDropzone"] span { color: white !important; }
-    [data-testid="stFileUploaderDropzone"] small { color: rgba(255,255,255,0.75) !important; }
-    [data-testid="stFileUploaderDropzone"] button {
-        color: white !important; border-color: white !important;
+    /* Hide default file name row - we show our own */
+    [data-testid="stFileUploader"] section > div > div:not([data-testid="stFileUploaderDropzone"]) {
+        display: none !important;
     }
-
-    /* File name below zone - text DARK */
-    [data-testid="stFileUploader"] .uploadedFile span { color: #1a1a1a !important; }
-    [data-testid="stFileUploader"] .uploadedFile small { color: #888 !important; }
 
     [data-testid="stImage"] img { border-radius: 12px; }
 </style>
@@ -62,6 +72,10 @@ st.markdown('<p class="main-title">🐾 Cat vs Dog</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Upload an image to identify</p>', unsafe_allow_html=True)
 
 uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png", "jfif", "webp"], label_visibility="collapsed")
+
+# Apna file name dikhao - dark text guaranteed
+if uploaded_file is not None:
+    st.markdown(f'<div class="file-name-box">📄 {uploaded_file.name}</div>', unsafe_allow_html=True)
 
 if uploaded_file is not None:
     col1, col2, col3 = st.columns([1, 2, 1])
