@@ -81,6 +81,15 @@ st.markdown("""
         display: none;
     }
 
+    /* File name text color fix */
+    [data-testid="stFileUploader"] span {
+        color: #1a1a1a !important;
+    }
+
+    [data-testid="stFileUploaderFileName"] {
+        color: #1a1a1a !important;
+    }
+
     /* Image display */
     [data-testid="stImage"] img {
         border-radius: 12px;
